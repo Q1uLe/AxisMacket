@@ -103,10 +103,9 @@ i = n_дв / n_вых ≈ 6100 / 130 ≈ 46,9   →   стандартное п�
 ## 4. Структура прошивки
 
 ```
-Индивидуальное задание/
+AxisMacket/
 ├── platformio.ini
 ├── README.md
-
 └── ESP32_L293D_Axis/
     ├── ESP32_L293D_Axis.ino   ProgramInit/ProgramCyclic, задача 5 мс, консоль
     ├── AxisTypes.h            Axis_typ (gAxis), перечисления, коды ошибок
