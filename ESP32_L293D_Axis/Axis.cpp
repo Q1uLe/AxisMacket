@@ -6,6 +6,7 @@
  *   контур положения:  v_cmd = v_set + position.kv * (s_set - s)
  *   контур скорости:   u = ff * v_set + speed.kv * (v_cmd - v) + I
  *   u (В) -> ШИМ на EN1 + направление IN1/IN2 микросхемы L293D
+ *            (или PWMA + DA у ESP-12E Motor Shield, если pin_in2 = -1)
  */
 #include "Axis.h"
 #include "soc/gpio_reg.h"
@@ -47,14 +48,19 @@ static void Drive_Write(Axis_typ* ax, float u, bool enable)
 	/* NaN/inf никогда не должны попасть в ШИМ: (uint32_t)NaN — неопределённое поведение */
 	if (!isfinite(u)) enable = false;
 
+	bool dirOnly = (ax->drive.pin_in2 < 0);   /* ESP-12E Motor Shield: PWMA + DA */
+
 	if (!enable) {
-		digitalWrite(ax->drive.pin_in1, LOW);
-		digitalWrite(ax->drive.pin_in2, LOW);
+		/* ШИМ = 0 отключает выходы; в режиме ШИМ+направление этого достаточно */
+		if (!dirOnly) {
+			digitalWrite(ax->drive.pin_in1, LOW);
+			digitalWrite(ax->drive.pin_in2, LOW);
+		}
 	} else {
 		u *= ax->drive.dir;
 		bool fwd = (u >= 0.0f);
 		digitalWrite(ax->drive.pin_in1, fwd ? HIGH : LOW);
-		digitalWrite(ax->drive.pin_in2, fwd ? LOW : HIGH);
+		if (!dirOnly) digitalWrite(ax->drive.pin_in2, fwd ? LOW : HIGH);
 		float k = fabsf(u) / ax->drive.u_supply;
 		if (k > 1.0f) k = 1.0f;
 		duty = (uint32_t)(k * dutyMax + 0.5f);
@@ -175,7 +181,7 @@ void Axis_Init(Axis_typ* ax)
 	Axis_UpdateScaling(ax);
 
 	pinMode(ax->drive.pin_in1, OUTPUT);
-	pinMode(ax->drive.pin_in2, OUTPUT);
+	if (ax->drive.pin_in2 >= 0) pinMode(ax->drive.pin_in2, OUTPUT);
 #if defined(ESP_ARDUINO_VERSION_MAJOR) && ESP_ARDUINO_VERSION_MAJOR >= 3
 	ledcAttach(ax->drive.pin_en, ax->drive.pwm_freq, ax->drive.pwm_bits);
 #else

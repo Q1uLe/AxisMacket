@@ -1,5 +1,5 @@
 /*
- * ESP32 + L293D + JGA25-370 (12 В, 130 об/мин, энкодер 11 имп/об)
+ * ESP32 + L293DD (ESP-12E Motor Shield) + JGA25-370 (12 В, 130 об/мин, энкодер 11 имп/об)
  * Управление осью по образцу ACOPOS / Automation Studio:
  *   gAxis            — глобальный объект оси (AxisTypes.h)
  *   MC_MoveVelocity  — ФБ 1, непрерывное движение
@@ -20,11 +20,13 @@
 
 #define CYCLE_MS        5
 
-#define PIN_L293_EN1    25   /* ШИМ */
-#define PIN_L293_IN1    26
-#define PIN_L293_IN2    27
-#define PIN_ENC_A       18   /* жёлтый провод */
-#define PIN_ENC_B       19   /* зелёный провод */
+/* ESP-12E Motor Shield (L293DD), канал A: PWMA = штырёк D1, DA = штырёк D3.
+   Для голой L293D: EN1/IN1/IN2 — укажите IN2 вместо -1. */
+#define PIN_L293_EN1    27   /* PWMA — ШИМ (скорость) */
+#define PIN_L293_IN1    32   /* DA — направление */
+#define PIN_L293_IN2    -1   /* на шилде IN2 = инверсия DA, отдельного провода нет */
+#define PIN_ENC_A       26   /* жёлтый провод */
+#define PIN_ENC_B       25   /* зелёный провод */
 
 #define MOTOR_SUPPLY_V  12.0f
 #define ENC_PPR         11.0f    /* импульсов на оборот вала двигателя на канал */

@@ -34,9 +34,9 @@ typedef enum : uint16_t {
 /* ---------- Подструктуры ---------- */
 
 typedef struct {
-	int8_t   pin_en;     /* L293D EN1 (ШИМ) */
-	int8_t   pin_in1;    /* L293D IN1 */
-	int8_t   pin_in2;    /* L293D IN2 */
+	int8_t   pin_en;     /* L293D EN1 (ШИМ) / PWMA шилда */
+	int8_t   pin_in1;    /* L293D IN1 / DA (направление) шилда */
+	int8_t   pin_in2;    /* L293D IN2; -1 — режим ШИМ+направление (IN2 инвертирует сам шилд) */
 	uint32_t pwm_freq;   /* Гц */
 	uint8_t  pwm_bits;   /* разрядность ШИМ */
 	int8_t   dir;        /* +1 / -1 — инверсия направления двигателя */
